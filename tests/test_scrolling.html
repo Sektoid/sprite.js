@@ -37,20 +37,39 @@ scene.loadImages(['img/tiles.png'], function() {
         tile_list.push(tile);
     }
 
+    var map=[];//sprites
+    var pos=[];//their coordinates
+    for(var x = 0; x < 5; x++) {
+        for(var y = 0; y < 5; y++) {
+            var tile = random_from_list(tile_list);
+            map.push(tile);
+            var XY=({x:48 * x, y:48 * y});
+            pos.push(XY);
+        }
+    }
+
     var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, x, y) {
-        for(var x = 0; x < (layer.w / 48); x++) {
-            for(var y = 0; y < (layer.h / 48); y++) {
-                var tile = random_from_list(tile_list);
-                // we need to update the position as the Sprites are shared
-                tile.position(48 * x, 48 * y);
-                tile.canvasUpdate(layer);
-            }
+        for(a in map) if(map.hasOwnProperty(a)){
+            var XY=pos[a];
+            map[a].position(XY.x, XY.y);
+            map[a].canvasUpdate(layer);
         }
     });
 
+    setTimeout(function(){// now I want to wait 5 seconds, and add 5x5 tiles to existing ones
+        for(var x = 5; x < 10; x++) {
+            for(var y = 5; y < 10; y++) {
+                var tile = random_from_list(tile_list);
+                map.push(tile);
+                var XY=({x:48 * x, y:48 * y});
+                pos.push(XY);
+            }
+        }
+    },5000);
+
     function paint(ticker) {
-        surface.move(-1 * ticker.lastTicksElapsed, -1 * ticker.lastTicksElapsed);
-        surface.update();
+        //surface.move(-1 * ticker.lastTicksElapsed, -1 * ticker.lastTicksElapsed);
+        surface.update();//it seems like it updates sprites only once, and then updates just coordinates
         if(scene.ticker.currentTick % 30 == 0) {
             fps.innerHTML = ticker.fps;
             load.innerHTML = ticker.load;
